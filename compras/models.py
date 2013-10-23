@@ -1,21 +1,10 @@
 # -*- coding: utf-8 -*-
 
 from datetime import datetime
-import os
-import random
 from django.db import models
-from compras.constants import MONEDA_CHOICES, ESTADO_PRODUCTO_CHOICES
-
-
-def get_photo_path(self, filename):
-    """
-    Devuelve un nombre aleatorio de archivo
-    """
-    univ = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890"
-    name = "".join([random.choice(univ) for i in xrange(20)])
-    root, ext = os.path.splitext(filename)
-
-    return u'photos/%s' % (name + ext)
+from django.db.models import Sum
+from common.utils import get_photo_path
+from .constants import MONEDA_CHOICES, ESTADO_PRODUCTO_CHOICES
 
 
 class Foto(models.Model):
@@ -40,27 +29,60 @@ class Tienda(models.Model):
     def __unicode__(self):
         return u"{obj.nombre}".format(obj=self)
 
+    class Meta:
+        ordering = ("nombre",)
+
 
 class Envio(models.Model):
     """
     Envío de productos de alguna tienda
     """
     tienda = models.ForeignKey(Tienda)
+    fecha_envio = models.DateField(u"fecha de envío", default=datetime.now)
     costo_envio = models.FloatField(u"costo de envío")
-    tipo_cambio = models.FloatField(u"tipo de cambio", null=True, blank=True)
     tipo_moneda = models.CharField(u"tipo de moneda", max_length=1,
-                                   choices=MONEDA_CHOICES)
+                                   choices=MONEDA_CHOICES, default="D")
+    tipo_cambio = models.FloatField(u"tipo de cambio", null=True, blank=True)
     costo_aduana = models.FloatField(u"costo de aduana", default=0)
     costo_extra = models.FloatField(default=0)
-    fecha_envio = models.DateField(u"fecha de envío", default=datetime.now)
     fecha_llegada = models.DateField(u"fecha de llegada", null=True, blank=True)
 
     def __unicode__(self):
-        return u"{obj.tienda el obj.fecha_envio}".format(obj=self)
+        return u"{obj.tienda}: {obj.fecha_envio}".format(obj=self)
+
+    def get_extras(self):
+        return self.costo_aduana + self.costo_extra
+
+    def get_total(self):
+        """
+        Devuelve el costo de todos los productos del envío mas los costos extra
+        """
+        costo_productos = self.producto_set.aggregate(
+            Sum("precio_compra"))["precio_compra__sum"]
+        if not costo_productos:
+            costo_productos = 0
+
+        return self.get_extras() + costo_productos + self.costo_envio
+
+    def get_costo_envio(self):
+        return u"%.2f %s" % (self.costo_envio, self.get_tipo_moneda_display())
+
+    get_costo_envio.short_description = u"costo de envío"
+
+    def get_extras_admin(self):
+        return u"%.2f %s" % (self.get_extras(), self.get_tipo_moneda_display())
+
+    get_extras_admin.short_description = u"costos extras"
+
+    def get_total_admin(self):
+        return u"%.2f %s" % (self.get_total(), self.get_tipo_moneda_display())
+
+    get_total_admin.short_description = u"costo total"
 
     class Meta:
         verbose_name = u"Envío"
         verbose_name_plural = u"Envíos"
+        ordering = ("fecha_envio",)
 
 
 class Marca(models.Model):

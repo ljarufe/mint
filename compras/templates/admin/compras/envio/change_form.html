@@ -1,0 +1,27 @@
+{% extends "admin/change_form.html" %}
+
+{% block extrahead %}
+    {{ block.super }}
+    <script type="text/javascript" src="{{ STATIC_URL }}common/js/jquery.min.js"></script>
+    <script type="text/javascript">
+        $(document).ready(function() {
+            if($("#id_tipo_moneda").val() == "D") {
+                $(".field-tipo_cambio").show();
+            }
+
+            $("#id_tipo_moneda").change(function() {
+                if(this.value == "S") {
+                    $(".field-tipo_cambio").slideUp("slow");
+                }
+                else if(this.value == "D") {
+                    $(".field-tipo_cambio").slideDown("slow");
+                }
+            });
+        });
+    </script>
+    <style>
+        .field-tipo_cambio {
+            display: none;
+        }
+    </style>
+{% endblock %}

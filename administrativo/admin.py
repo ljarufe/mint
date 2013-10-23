@@ -4,10 +4,14 @@ from django.contrib import admin
 from administrativo.models import EgresoAdministrativo, Ingreso
 
 
-class Admin(admin.ModelAdmin):
-    """
+class EgresoAdministrativoAdmin(admin.ModelAdmin):
+    list_display = ("detalle_general", "fecha", "multiple", "cantidad",
+                    "get_precio_neto")
+    list_filter = ("multiple",)
 
-    """
 
-admin.site.register(EgresoAdministrativo)
-admin.site.register(Ingreso)
+class IngresoAdmin(admin.ModelAdmin):
+    list_display = ("detalle_general", "fecha", "get_monto",)
+
+admin.site.register(EgresoAdministrativo, EgresoAdministrativoAdmin)
+admin.site.register(Ingreso, IngresoAdmin)

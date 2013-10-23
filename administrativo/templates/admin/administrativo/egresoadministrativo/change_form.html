@@ -1,0 +1,46 @@
+{% extends "admin/change_form.html" %}
+
+{% block extrahead %}
+    {{ block.super }}
+    <script type="text/javascript" src="{{ STATIC_URL }}common/js/jquery.min.js"></script>
+    <script type="text/javascript" src="{{ STATIC_URL }}common/js/utils.js"></script>
+    <script type="text/javascript">
+        $(document).ready(function() {
+            if($("#id_tipo_moneda").val() == "D") {
+                $(".field-tipo_cambio").show();
+            }
+
+            if($("#id_multiple").is(":checked")) {
+                $(".field-precio_unitario, .field-cantidad, .field-unidad").show();
+            }
+
+            $("#id_tipo_moneda").change(function() {
+                if(this.value == "S") {
+                    $(".field-tipo_cambio").slideUp("slow");
+                }
+                else if(this.value == "D") {
+                    $(".field-tipo_cambio").slideDown("slow");
+                }
+            });
+
+            $("#id_multiple").change(function() {
+                if($(this).is(":checked")) {
+                    $(".field-precio_unitario, .field-cantidad, .field-unidad").slideDown("slow");
+                }
+                else {
+                    $(".field-precio_unitario, .field-cantidad, .field-unidad").slideUp("slow");
+                }
+            });
+
+            $("#id_precio_unitario, #id_cantidad").change(function() {
+                var precio_neto = toNumber("#id_precio_unitario") * toNumber("#id_cantidad");
+                $("#id_precio_neto").val(precio_neto);
+            });
+        });
+    </script>
+    <style>
+        .field-tipo_cambio, .field-precio_unitario, .field-cantidad, .field-unidad {
+            display: none;
+        }
+    </style>
+{% endblock %}

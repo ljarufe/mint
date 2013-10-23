@@ -17,7 +17,7 @@ from .local_settings import DATABASES
 ALLOWED_HOSTS = []
 
 TIME_ZONE = 'America/Lima'
-LANGUAGE_CODE = 'en'
+LANGUAGE_CODE = 'es'
 SITE_ID = 1
 USE_I18N = True
 USE_L10N = True
@@ -80,6 +80,7 @@ INSTALLED_APPS = (
     'easy_thumbnails',
     # local
     'administrativo',
+    'common',
     'compras',
     'ventas',
 )

@@ -4,14 +4,23 @@ from django.contrib import admin
 from compras.models import Tienda, Foto, Envio, Marca, TipoProducto, Producto
 
 
-class Admin(admin.ModelAdmin):
-    """
+class TiendaAdmin(admin.ModelAdmin):
+    list_display = ("nombre", "url", "observaciones",)
 
-    """
+
+class ProductoInLine(admin.StackedInline):
+    extra = 1
+    model = Producto
+
+
+class EnvioAdmin(admin.ModelAdmin):
+    list_display = ("tienda", "fecha_envio", "get_costo_envio",
+                    "get_extras_admin", "get_total_admin")
+    inlines = [ProductoInLine]
 
 admin.site.register(Foto)
-admin.site.register(Tienda)
-admin.site.register(Envio)
+admin.site.register(Tienda, TiendaAdmin)
+admin.site.register(Envio, EnvioAdmin)
 admin.site.register(Marca)
 admin.site.register(TipoProducto)
 admin.site.register(Producto)
