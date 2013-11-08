@@ -3,19 +3,9 @@
 from datetime import datetime
 from django.db import models
 from django.db.models import Sum
+from common.models import Foto
 from common.utils import get_photo_path
 from .constants import MONEDA_CHOICES, ESTADO_PRODUCTO_CHOICES
-
-
-class Foto(models.Model):
-    """
-    Foto genérica
-    """
-    nombre = models.CharField(max_length=50, blank=True)
-    imagen = models.ImageField(upload_to=get_photo_path)
-
-    def __unicode__(self):
-        return u"{obj.nombre}".format(obj=self)
 
 
 class Tienda(models.Model):
@@ -55,7 +45,7 @@ class Envio(models.Model):
 
     def get_total(self):
         """
-        Devuelve el costo de todos los productos del envío mas los costos extra
+        Devuelve el costo de todos los productos del envío y los costos extra
         """
         costo_productos = self.producto_set.aggregate(
             Sum("precio_compra"))["precio_compra__sum"]
@@ -106,7 +96,6 @@ class TipoProducto(models.Model):
     url = models.URLField(blank=True)
     foto_principal = models.ImageField(upload_to=get_photo_path, blank=True,
                                        null=True)
-    fotos = models.ManyToManyField(Foto)
 
     def __unicode__(self):
         return u"{obj.nombre}".format(obj=self.nombre)
@@ -114,6 +103,16 @@ class TipoProducto(models.Model):
     class Meta:
         verbose_name = u"tipo de producto"
         verbose_name_plural = u"tipos de producto"
+
+
+class FotoProducto(Foto):
+    """
+    Foto para los tipos de producto
+    """
+    tipo_producto = models.ForeignKey(TipoProducto,
+                                      verbose_name=u"tipo de producto")
+    orden = models.IntegerField()
+    subir_facebook = models.BooleanField()
 
 
 # TODO: Crear un método para clonar Productos

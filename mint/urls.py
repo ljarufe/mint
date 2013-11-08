@@ -14,5 +14,5 @@ urlpatterns = patterns(
     (r'^static/(?P<path>.*)$','django.views.static.serve',
          {'document_root': settings.STATIC_ROOT,'show_indexes': True}),
     # third apps
-    url(r'^admin/', include(admin.site.urls)),
+    (r'^admin/', include(admin.site.urls)),
 )

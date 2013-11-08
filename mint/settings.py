@@ -78,6 +78,7 @@ INSTALLED_APPS = (
     # external
     'south',
     'easy_thumbnails',
+    'gunicorn',
     # local
     'administrativo',
     'common',

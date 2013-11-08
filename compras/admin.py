@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from django.contrib import admin
-from compras.models import Tienda, Foto, Envio, Marca, TipoProducto, Producto
+from compras.models import Tienda, Envio, Marca, TipoProducto, Producto, FotoProducto
 
 
 class TiendaAdmin(admin.ModelAdmin):
@@ -18,9 +18,18 @@ class EnvioAdmin(admin.ModelAdmin):
                     "get_extras_admin", "get_total_admin")
     inlines = [ProductoInLine]
 
-admin.site.register(Foto)
+
+class FotoProductoInLine(admin.TabularInline):
+    extra = 1
+    model = FotoProducto
+    readonly_fields = ("orden",)
+
+
+class TipooductoAdmin(admin.ModelAdmin):
+    inlines = [FotoProductoInLine]
+
 admin.site.register(Tienda, TiendaAdmin)
 admin.site.register(Envio, EnvioAdmin)
 admin.site.register(Marca)
-admin.site.register(TipoProducto)
+admin.site.register(TipoProducto, TipooductoAdmin)
 admin.site.register(Producto)
